@@ -1,0 +1,6 @@
+{
+  "name": "ai-chat-context-exporter",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Paste a chat share link, get a compact context file back. Frontend + Vercel serverless function, zero dependencies."
+}

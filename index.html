@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Chat Context Exporter</title>
+<style>
+:root{--bg:#080c14;--card:#111827eF;--card2:#0d1422;--line:#253149;--text:#f1f5ff;--muted:#9aa8c0;--accent:#7657ff;--accent2:#4f90ff;--ok:#55d39a;--bad:#ff7f88}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(900px 500px at 10% -10%,#7657ff2c,transparent 55%),radial-gradient(800px 450px at 100% 0,#4f90ff24,transparent 55%),var(--bg);color:var(--text);font:14px Inter,Segoe UI,Arial,sans-serif;min-height:100vh}
+.wrap{width:min(1120px,calc(100% - 28px));margin:auto;padding:26px 0 34px}.top{display:flex;justify-content:space-between;align-items:center}.brand{display:flex;gap:12px;align-items:center}.logo{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 12px 30px #7657ff40}.name{font-weight:700}.sub{color:var(--muted);font-size:11px;margin-top:3px}.ready{border:1px solid var(--line);padding:8px 11px;border-radius:999px;font-size:11px;color:#cbd6eb}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ok);margin-right:6px}
+.hero{padding:70px 0 34px;max-width:820px}.eyebrow{font-size:10px;font-weight:800;letter-spacing:.16em;color:#a89bff}.hero h1{font-size:clamp(40px,6vw,65px);line-height:1.02;letter-spacing:-.055em;margin:14px 0}.hero h1 span{color:#91a0bb}.hero p{color:var(--muted);line-height:1.7;max-width:760px;font-size:15px}
+.grid{display:grid;grid-template-columns:1.5fr .8fr;gap:20px}.card{background:linear-gradient(180deg,#141d30e8,#0d1422e8);border:1px solid var(--line);border-radius:22px;box-shadow:0 22px 55px #00000048;padding:25px;backdrop-filter:blur(14px)}.label{font-size:10px;font-weight:800;letter-spacing:.14em;color:#8392ad}h2{font-size:19px;margin:7px 0 0}.head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.badge{font-size:9px;border:1px solid var(--line);color:var(--muted);padding:7px 9px;border-radius:999px}
+.panel{display:block;margin-top:20px}
+label{display:block;color:#cdd7e9;font-size:12px;font-weight:600;margin-bottom:8px}input,select{width:100%;padding:13px 14px;background:#080d17;color:var(--text);border:1px solid var(--line);border-radius:11px;outline:none}input:focus,select:focus{border-color:#7657ff99;box-shadow:0 0 0 4px #7657ff14}.hint{font-size:10px;line-height:1.6;color:#71809a;margin-top:8px}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);overflow:hidden;border-radius:13px;margin:24px 0 17px}.sum{background:#ffffff03;padding:13px}.sum span{display:block;color:#6f7e98;font-size:9px;text-transform:uppercase;letter-spacing:.1em}.sum strong{display:block;font-size:11px;margin-top:6px}
+button.primary{width:100%;border:0;color:#fff;padding:14px;border-radius:12px;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));cursor:pointer}.primary:disabled{opacity:.65;cursor:not-allowed}.msg{display:none;padding:11px 12px;border-radius:10px;font-size:11px;line-height:1.5;margin-top:12px}.msg.show{display:block}.ok{color:#b9eed4;background:#55d39a12;border:1px solid #55d39a35}.bad{color:#ffc7cb;background:#ff7f8812;border:1px solid #ff7f8835}
+.feature{display:flex;gap:10px;padding:14px 0;border-bottom:1px solid var(--line)}.feature:last-child{border:0}.num{font-size:9px;color:#71809a;min-width:21px}.feature b{font-size:11px}.feature p{font-size:10px;color:var(--muted);line-height:1.5;margin:4px 0 0}.providers{display:grid;grid-template-columns:1fr;gap:8px;margin-top:15px}.provider{border:1px solid var(--line);border-radius:10px;padding:11px;text-align:center;font-size:11px;color:#c8d3e7;background:#ffffff02}.provider.soon{opacity:.45}.note{font-size:10px;line-height:1.6;color:#71809a;margin-top:13px}
+.pills{display:flex;flex-wrap:wrap;gap:8px}.pill{border:1px solid var(--line);background:#080d17;color:#c8d3e7;font-size:11px;padding:9px 13px;border-radius:999px;cursor:pointer;user-select:none}.pill input{position:absolute;opacity:0;pointer-events:none}.pill.active{border-color:#7657ff99;background:#7657ff1c;color:#fff}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+footer{display:flex;justify-content:space-between;color:#5e6e88;font-size:9px;padding:18px 2px}
+@media(max-width:850px){.grid{grid-template-columns:1fr}.side{display:grid;grid-template-columns:1fr 1fr;gap:20px}}
+@media(max-width:600px){.wrap{width:calc(100% - 18px)}.hero{padding-top:52px}.hero h1{font-size:40px}.card{padding:19px}.summary,.side{grid-template-columns:1fr}.head{flex-direction:column}.badge{white-space:normal}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="logo">AI</div>
+      <div><div class="name">Chat Context Exporter</div><div class="sub">Compact handoffs for your next AI chat</div></div>
+    </div>
+    <div class="ready"><span class="dot"></span>Ready</div>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">AI WORKFLOW</div>
+    <h1>Carry the useful context.<br><span>Leave the chat history behind.</span></h1>
+    <p>Paste a public chat share link and generate a compact context file for continuing the work in a new AI conversation.</p>
+  </section>
+
+  <section class="grid">
+    <form class="card" id="form">
+      <div class="head"><div><div class="label">1 · SOURCE</div><h2>Provide your chat share URL</h2></div><div class="badge">serverless</div></div>
+
+      <div id="urlPanel" class="panel">
+        <label for="url">Chat share URL</label>
+        <input id="url" type="url" placeholder="https://claude.ai/share/00000000-0000-0000-0000-000000000000" required>
+        <div class="hint">Public share links only. Claude works today; other providers are recognized but not wired up yet (see the panel on the right).</div>
+      </div>
+
+      <div class="panel">
+        <label>Token budget</label>
+        <div class="pills" id="budgetPills">
+          <label class="pill" data-value="2000"><input type="radio" name="budget" value="2000">2,000</label>
+          <label class="pill" data-value="5000"><input type="radio" name="budget" value="5000" checked>5,000</label>
+          <label class="pill" data-value="10000"><input type="radio" name="budget" value="10000">10,000</label>
+          <label class="pill" data-value="20000"><input type="radio" name="budget" value="20000">20,000</label>
+          <label class="pill" data-value="dynamic"><input type="radio" name="budget" value="dynamic">Dynamic (everything)</label>
+        </div>
+        <div class="hint">Fixed budgets trim older messages and lists to fit that many tokens. Dynamic skips trimming and includes the full extracted context.</div>
+      </div>
+
+      <div class="row2">
+        <div class="panel" style="margin-top:14px">
+          <label for="format">Export format</label>
+          <select id="format">
+            <option value="readme">README (.md)</option>
+            <option value="txt">Plain text (.txt)</option>
+            <option value="doc">Word (.doc)</option>
+            <option value="pdf">PDF (.pdf)</option>
+          </select>
+        </div>
+        <div class="panel" style="margin-top:14px">
+          <label for="recent">Recent messages to keep</label>
+          <input id="recent" type="number" min="1" max="50" value="8">
+        </div>
+      </div>
+
+      <div class="summary">
+        <div class="sum"><span>Output</span><strong id="sumOutput">.md file</strong></div>
+        <div class="sum"><span>Budget</span><strong id="sumBudget">5,000 tok</strong></div>
+        <div class="sum"><span>Use for</span><strong>New AI chat</strong></div>
+      </div>
+
+      <button class="primary" id="submit" type="submit">Generate file →</button>
+      <div class="msg" id="msg"></div>
+    </form>
+
+    <div class="side">
+      <aside class="card">
+        <div class="label">WHAT YOU GET</div>
+        <div class="feature"><span class="num">01</span><div><b>Objective</b><p>Main goal from the old chat.</p></div></div>
+        <div class="feature"><span class="num">02</span><div><b>Requirements & decisions</b><p>Key constraints and choices.</p></div></div>
+        <div class="feature"><span class="num">03</span><div><b>Technical context</b><p>Commands and latest code versions.</p></div></div>
+        <div class="feature"><span class="num">04</span><div><b>Problems & next steps</b><p>Issues, solutions and pending work.</p></div></div>
+        <div class="feature"><span class="num">05</span><div><b>Recent conversation</b><p>Latest selected messages.</p></div></div>
+      </aside>
+
+      <aside class="card">
+        <div class="label">PROVIDERS</div>
+        <div class="providers">
+          <div class="provider">Claude ✓</div>
+          <div class="provider soon">ChatGPT — soon</div>
+          <div class="provider soon">Gemini — soon</div>
+          <div class="provider soon">Poe / Perplexity — soon</div>
+        </div>
+        <div class="note">The backend only has a working extractor for Claude share links right now. Other links are recognized and rejected with a clear message rather than failing silently.</div>
+      </aside>
+    </div>
+  </section>
+
+  <footer><span>AI Chat Context Exporter</span><span>Single-file frontend</span></footer>
+</div>
+
+<script>
+// ---- Config -----------------------------------------------------------
+// The backend is a serverless function deployed alongside this page
+// (api/generate.js), so this is always a same-origin relative path - no
+// CORS, no separate host to configure, no mixed-content issues.
+const API_URL = "/api/generate";
+
+const FORMAT_LABELS = { readme: ".md file", txt: ".txt file", doc: ".doc file", pdf: ".pdf file" };
+
+const $ = id => document.getElementById(id);
+
+function message(text, good = false) {
+  $("msg").textContent = text;
+  $("msg").className = "msg show " + (good ? "ok" : "bad");
+}
+
+function clearMessage() {
+  $("msg").className = "msg";
+  $("msg").textContent = "";
+}
+
+// ---- Live summary + budget pill styling --------------------------------
+function syncBudgetPills() {
+  document.querySelectorAll("#budgetPills .pill").forEach(p => {
+    const input = p.querySelector("input");
+    p.classList.toggle("active", input.checked);
+  });
+  const checked = document.querySelector('input[name="budget"]:checked');
+  $("sumBudget").textContent = checked.value === "dynamic" ? "All content" : Number(checked.value).toLocaleString() + " tok";
+  $("recent").disabled = checked.value === "dynamic";
+}
+document.querySelectorAll('input[name="budget"]').forEach(el => el.addEventListener("change", syncBudgetPills));
+$("format").addEventListener("change", () => { $("sumOutput").textContent = FORMAT_LABELS[$("format").value]; });
+syncBudgetPills();
+
+async function downloadResponse(res) {
+  const blob = await res.blob();
+  let filename = "context-export";
+  const cd = res.headers.get("content-disposition") || "";
+  const match = cd.match(/filename="?([^"]+)"?/i);
+  if (match) filename = match[1];
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+$("form").onsubmit = async e => {
+  e.preventDefault();
+  clearMessage();
+
+  const chatUrl = $("url").value.trim();
+
+  // Only a loose "is this a real https URL" check here - the backend owns
+  // provider support and returns a clear, specific error for anything it
+  // can't process yet (unsupported provider, bad path, etc).
+  if (!/^https:\/\/[^\s]+$/i.test(chatUrl)) {
+    message("Please enter a full https:// share link.");
+    return;
+  }
+
+  const budget = document.querySelector('input[name="budget"]:checked').value;
+  const format = $("format").value;
+  const recent = $("recent").value || "8";
+
+  const btn = $("submit");
+  btn.disabled = true;
+  btn.textContent = "Generating…";
+
+  const payload = {
+    url: chatUrl,
+    budgetMode: budget === "dynamic" ? "dynamic" : "fixed",
+    budgetValue: budget === "dynamic" ? "" : budget,
+    recent,
+    format
+  };
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      let detail = "";
+      try { detail = ((await res.json()).error || "").slice(0, 300); } catch (_) {}
+      throw new Error(detail || ("HTTP " + res.status));
+    }
+
+    await downloadResponse(res);
+    message("File generated. Download started.", true);
+  } catch (err) {
+    message("Request failed: " + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Generate file →";
+  }
+};
+</script>
+</body>
+</html>
